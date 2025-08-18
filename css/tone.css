@@ -1,0 +1,105 @@
+/*==================================================
+  SolarJewel 共通スタイルシート – v1.5 (2025‑07‑11)
+  --------------------------------------------------
+  - 古い .form-section 定義を完全に削除して重複を解消
+  - タイトル下余白をさらに詰め (.4rem→.2rem)
+  - 画像サイズ／メディアクエリは v1.4 のまま維持
+==================================================*/
+
+/*----- カラーパレット & リセット -----*/
+html {
+  /* 14px〜17px の間で自動スケール */
+  font-size: clamp(14px, 2.5vw, 17px);
+  scroll-behavior: smooth;
+}
+
+:root{
+ --clr-primary:#7c3aed;
+ --clr-primary-dark:#5b21b6;
+ --clr-bg:#f5f3ff;
+ --clr-text:#4c1d95;
+ --radius-lg:20px;
+ --radius-md:12px;   /* ←★これを追加すると安全 */
+}
+
+/* ベース */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--clr-bg);
+  color:var(--clr-text);
+  font-family:"Zen Kaku Gothic New",sans-serif;
+  line-height:1.7;
+}
+
+@media (max-width: 480px){
+  body{ font-size: 15px; }   /* 例：さらに少しだけ大きく */
+}
+
+
+/* ====== タブレット〜PCでは箱を少し大きく ====== */
+@media (min-width: 768px) {          /* iPad mini 以上で有効 */
+  .music-box{
+    max-width: 640px;               /* ←お好みで 600〜720px くらい */
+    padding: 2.2rem;                /* 余白も少しゆったり */
+  }
+  .music-box h1{
+    font-size: 1.6rem;              /* タイトルを大きめに */
+  }
+}
+
+/* 楽曲リスト */
+.music-box{
+  width: clamp(280px, 90vw, 480px);
+  max-width:480px;
+  margin:2rem auto;
+  padding:1.5rem;
+  background:#fff;
+  border-radius:var(--radius-lg);
+  box-shadow:0 4px 8px rgba(0,0,0,.05);
+}
+.music-box h1{
+  font-size:1.4rem;
+  text-align:center;
+  margin-bottom:1rem;
+}
+.track{
+  margin-bottom:1.2rem;
+}
+
+/* --- TOPに戻るボタン --------------------------- */
+.back-to-top {
+  text-align: center;
+  margin: 3rem 0;
+}
+
+.back-btn {
+  background-color: var(--clr-primary);
+  color: white;
+  padding: 0.8rem 1.6rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: var(--clr-primary-dark);
+}
+
+/* ====== iPad Pro 以上で箱をワイドに ====== */
+@media (min-width: 1024px){      /* 1024px〜：iPad Pro 縦／横・PC */
+  .music-box{
+    /* ❶ 横幅：画面の 70% 〜 820px の間で自動スケール */
+    width: 70vw;                 /* 70% にして余白を残す */
+    max-width: 820px;            /* 上限を 820px に拡大 */
+
+    /* ❷ 余白と文字サイズも少しゆったり */
+    padding: 2.4rem;
+  }
+  .music-box h1{
+    font-size: 1.8rem;
+  }
+}
+
+

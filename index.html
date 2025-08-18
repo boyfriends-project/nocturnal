@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+<!-- フォント読み込み -->
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-587TGTD330"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-587TGTD330');
+</script>
+
+ <!-- 診断結果パネル -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ソーラージュエル診断</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  
+  <!-- ロゴ -->
+  <header class="title-section">
+    <img src="title.png" loading="lazy" alt="NOCTURNALロゴ" class="title-logo" />
+	<h1 class="visually-hidden">“心の音”を聴く《クリスタル占い》NOCTURNAL</h1>
+  </header>
+
+<!-- ヒーローセクション -->
+  <section class="hero-image">
+      <img src="top.webp"  loading="lazy" alt="宝石帯" class="hero-img" />
+ <div class="hero-inner">
+<!-- ヒーロー下に出すテキスト類などがあるならここに入れる -->
+<p><b>個性豊かなBOYFRIENDSがあなたを導きます</b></p>
+ </div>
+  </section>
+
+  <!-- 入力フォーム -->
+  <section class="form-section">
+    <label for="birth">👇生年月日を選んでね🔮</label>
+
+<div class="input-group">
+    <input type="date" id="birth" />
+    <button id="diagnoseBtn">調べる</button>
+  </div>
+</section>
+
+  <!-- 結果表示 ここは JS で表示を制御 -->
+  <section id="result-panel" class="result-panel hidden">
+    <div id="solarNumber"></div>
+
+  <!--<p id="toneTitle" class="tone-title"></p>
+    <p id="catchcopy" class="catchcopy"></p>-->
+
+    <div class="result-body">
+      <!-- 左：画像 -->
+      <div class="result-images">
+	<img id="soulJewelImg" alt="ソウルジュエルの画像" />
+        <img id="myJewelImg" alt="マイジュエルの画像" />
+      </div>
+
+      <!-- 右：テキスト -->
+      <div class="result-texts">
+	<p id="soulJewelText"></p>
+        <p id="myJewelText"></p>
+       
+        <!--<p id="toneText"></p>-->
+	<!--<p id="toneCopy" class="tone-copy"></p>-->
+	
+	<p id="tonePlayerText"></p>
+        
+	<p id="actionText"></p>
+      </div>
+    </div>
+  </section>
+
+
+<!-- 診断結果を保存 -->
+<div class="share-box">
+
+<a href="tone/tones.html" class="share-btn">🎶Tone 音楽室</a>
+
+<a href="char.html" class="share-btn">💗キャラ紹介</a>
+
+<a href="gods.html" class="share-btn">💎守護神一覧</a>
+
+</div>
+
+<!-- LINE特典バナー -->
+<a class="promoBanner"
+   href="https://lin.ee/j2byiZf" target="_blank" rel="noopener"
+   aria-label="公式LINE限定特典：守護神の待ち受け＆心の音フル音源を無料でプレゼント">
+
+  <picture>
+    <!-- WebP（推奨） -->
+    <source
+      type="image/webp"
+      srcset="/images/banners/line_friend.webp"
+      sizes="(max-width: 768px) 92vw, 1100px">
+    <!-- PNG/JPG フォールバック -->
+    <img
+      src="/images/banners/line_friend.jpg"
+      width="1200" height="300"
+      alt="公式LINE限定プレゼント｜守護神の待ち受け画像＆心の音（Tone）フル音源がもらえる"
+      loading="eager" decoding="async">
+  </picture>
+</a>
+
+<div class="share-box">
+<!-- LINE 友だち追加 -->
+  <a class="share-btn"
+     href="https://lin.ee/j2byiZf"
+     target="_blank" rel="noopener">LINE友だち追加</a>
+
+ <!-- X (旧Twitter) でシェア -->
+  <a id="shareX" class="share-btn" target="_blank" rel="noopener">
+    Xでシェア
+  </a>
+
+<!--  <a id="shareX"      class="share-btn" href="#" target="_blank">Xでシェア</a>
+  <a id="shareLine"   class="share-btn" href="#" target="_blank">LINEで送る</a> -->
+
+<!--<a id="dlResult"    class="share-btn" href="#">診断結果をDL</a>-->
+
+
+ <!-- LINEでシェア -->
+  <a id="shareLine" class="share-btn" target="_blank" rel="noopener">
+    LINEでシェア
+  </a>
+
+  <!-- X アカウントをフォロー -->
+  <a class="share-btn"
+     href="https://twitter.com/A_Kita_story"
+     target="_blank" rel="noopener">Xをフォロー</a>
+
+<!--<a id="copyLink"    class="share-btn" href="#">リンクをコピー</a>-->
+
+</div>
+
+
+<script>
+  /* 共有用のテキストとURLを準備 */
+  const pageURL  = encodeURIComponent(location.href);
+  const shareTxt = encodeURIComponent(
+'BOYFRIENDS占いで“心の音”を診断したよ💎\n#BFS #占い');
+
+  /* X（旧Twitter） */
+  document.getElementById('shareX').href =
+  `https://twitter.com/intent/tweet?text=${shareTxt}&url=${pageURL}`; 
+
+  /* LINE */
+  document.getElementById('shareLine').href =
+    `https://social-plugins.line.me/lineit/share?url=${pageURL}`;
+
+  /* コピーリンク */
+  document.getElementById("copyLink").onclick = () => {
+    navigator.clipboard.writeText(location.href)
+      .then(() => alert("リンクをコピーしました！"))
+      .catch(() => alert("コピーに失敗しました…"));
+  };
+</script>
+
+
+<script type="module" src="main.js"></script>
+
+<footer style="text-align: center; padding: 20px; font-size: 14px;">
+  <a href="/about.html">運営者情報</a>
+  <a href="/privacy.html">プライバシーポリシー</a><br>
+  <a href="/disclaimer.html">免責事項</a>
+  <a href="/legal.html">特定商取引法表記</a>
+</footer>
+
+
+<!-- 推奨環境フッター -->
+  <footer class="env-note">
+　　※これはβ版です。端末によってレイアウトが少し異なる場合があります。不具合のご連絡は<a href="https://docs.google.com/forms/d/e/1FAIpQLSfxAnNobYeng3jB77mChCC7NysuTHdL9HEjnD8gDi39-49C1w/viewform?usp=preview">こちら</a><br>
+    ※ 推奨環境：Chrome&nbsp;80 以上／Safari&nbsp;14 以上／Edge&nbsp;79 以上／iOS&nbsp;14 以上／Android&nbsp;10 以上
+  </footer>
+
+</body>
+</html>

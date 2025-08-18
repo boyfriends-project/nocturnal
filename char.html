@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>メインキャラ紹介</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
+<style>
+  :root{
+--bg:#efe9ff;
+--fg:#2b2b36;
+--muted:#6b6b7a;
+--card:#fff;--ring:#ff6bb3
+}
+  body{
+margin:0;
+background:var(--bg);
+color:var(--fg);
+font-family:"Zen Kaku Gothic New",system-ui,sans-serif
+}
+  .wrap{
+max-width:1100px;
+margin:auto;
+padding:24px
+}
+  h1{
+margin:0 0 12px;text-align:center;
+font-size:clamp(22px,3.6vw,32px)
+}
+
+  /* === グリッド：PCでの余白を吸収してキレイに === */
+.grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 900px;   /* 好みに応じて調整 */
+  margin: 0 auto;
+}
+@media (max-width:760px){
+  .grid{ grid-template-columns: repeat(2, 1fr);
+}
+  .poster {
+    height: auto;
+    max-height: 70vh; /* 画面をはみ出さないようにする */
+  }
+}
+
+/* === カード === */
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:12px;
+  text-align:center;
+  position: relative;
+  cursor: pointer;
+}
+/* 600x800（3:4）→ 円形トリミング。中央を活かすためobject-position中央 */
+.thumbWrap{
+  aspect-ratio:1/1;
+  border-radius:999px;
+  padding:0;
+  background:none;
+}
+  .thumb{
+width:100%;
+height:100%;
+object-fit:cover;
+border-radius:999px;
+cursor:pointer;
+background:none;
+}
+/* テキスト */
+.name{
+margin:8px 0 0;
+font-weight:700
+}
+.role{
+margin:0;
+color:var(--muted);
+font-size:12px
+}
+
+  .card[aria-selected="true"] .thumbWrap{
+   outline: none;
+}
+/* プレビュー枠：画像サイズに合わせて横幅だけ制限 */
+.preview{
+  margin:18px auto 0;
+  background:var(--card);
+  border-radius:14px;
+  padding:12px;                /* 枠を付けたいなら残す。不要なら 0 */
+  max-width: min(720px, 70vw); /* 画像実寸＋余白に近い値に抑える */
+  padding:0; background:transparent;
+}
+/* 画像は枠いっぱいで自動縮小 */
+.poster{
+  display:block;
+  width:100%;
+  aspect-ratio: 9 / 16;  /* 720×1280の比率を保持 */
+  height:auto;           /* 高さは比率から自動計算 */
+  object-fit: contain;   /* 画像を切らない */
+  border-radius:10px;
+  max-height:80vh;       /* 画面より長すぎるのを防止（PCで有効） */
+  margin-inline:auto;
+}
+/* === ボタン === */
+.dlBtn{
+  appearance:none;
+  border-radius:8px;
+  padding:10px 14px;
+  background:#c4a3ff;
+  color:#fff;
+  font-weight:700;
+  text-decoration:none;
+  display:inline-flex;
+  gap:5px;
+  align-items:center
+}
+p { text-align: center;
+}
+/* カード全体で選択表示（角丸に沿う） */
+.card{
+  position: relative;
+  cursor: pointer;            /* カード全体がクリックできる */
+}
+
+
+/* キーボード操作の見やすさ */
+.card:focus-visible{
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  box-shadow: none; /* 重複を避ける */
+}
+
+/* 画像側のカーソルは不要 */
+.thumb{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  border-radius:999px;
+  background:none;
+  cursor: default; /* 画像自体はクリック感を消す（カード全体がクリック） */
+}
+
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>メインキャラ紹介</h1>
+
+  <!-- サムネグリッド -->
+  <div id="grid" class="grid" role="list"></div>
+
+  <!-- 1枚だけ表示するプレビュー（初期は水無月） -->
+  <section class="preview">
+    <img id="poster" class="poster" alt="皆月レオナのプロフィール画像" loading="lazy">
+  </section>
+</main>
+
+<script>
+(() => {
+  // パス（調整してね）
+  const THUMBS = "./images/main/thumbs";     // 円形サムネ
+  const POSTERS = "./images/main/posters";   // 750x1080 など大きい画像
+
+  // 6人分
+  const C = [
+    { id:"reona", name:"水無月 玲於奈", role:"高校生・占い師",  thumb:"minazuki.webp",  poster:"minazuki_750x1080.webp" },
+    { id:"akira", name:"朝霧 豪", role:"カフェ＆バーのマスター",        thumb:"asagiri.webp",  poster:"asagiri_750x1080.webp" },
+    { id:"sora",  name:"有栖川 聖",   role:"音楽講師",          thumb:"arisugawa.webp",   poster:"arisugawa_750x1080.webp" },
+    { id:"shin",  name:"二ノ宮 翔太",   role:"アイドル",        thumb:"ninomiya.webp",   poster:"ninomiya_750x1080.webp" },
+    { id:"haru",  name:"柊 晶",   role:"ゲームデザイナー",          thumb:"hiiragi.webp",   poster:"hiiragi_750x1080.webp" },
+    { id:"ryu",   name:"金城 烈", role:"カリスマ社長",    thumb:"kaneshiro.webp",    poster:"kaneshiro_750x1080.webp" },
+  ];
+
+  const grid = document.getElementById("grid");
+  const poster = document.getElementById("poster");
+
+ // アクセシビリティ：gridにリストの役割を付与（任意）
+  grid?.setAttribute("role","list");
+
+  // カード生成
+  C.forEach((p,i)=>{
+    const card = document.createElement("section");
+    card.className = "card";
+    card.setAttribute("role","listitem");
+    card.tabIndex = 0; // キーボード選択可
+    card.dataset.id = p.id;
+    card.dataset.poster = `${POSTERS}/${p.poster}`;
+    card.dataset.alt = `${p.name}のプロフィール画像`;
+    card.innerHTML = `
+      <div class="thumbWrap">
+        <img class="thumb" src="${THUMBS}/${p.thumb}" alt="${p.name}" loading="lazy">
+      </div>
+      <p class="name">${p.name}</p>
+      <p class="role">${p.role}</p>
+    `;
+    if(i===0) card.setAttribute("aria-selected","true"); // 初期選択
+    grid.appendChild(card);
+  });
+
+ // 初期プレビュー
+  poster.src = grid.querySelector(".card")?.dataset.poster || "";
+  poster.alt = grid.querySelector(".card")?.dataset.alt || "";
+
+ // 共通：選択処理
+  function selectCard(card){
+    if(!card) return;
+    poster.src = card.dataset.poster;
+    poster.alt = card.dataset.alt;
+    grid.querySelectorAll(".card[aria-selected]").forEach(c=>c.removeAttribute("aria-selected"));
+    card.setAttribute("aria-selected","true");
+    document.querySelector(".preview")?.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  // クリック：カード全体で反応
+  grid.addEventListener("click", e=>{
+    const card = e.target.closest(".card");
+    if(!card || !grid.contains(card)) return;
+    selectCard(card);
+  });
+
+  // キーボード（Enter / Space）
+  grid.addEventListener("keydown", e=>{
+    if((e.key === "Enter" || e.key === " ") && e.target.closest(".card")){
+      e.preventDefault();
+      selectCard(e.target.closest(".card"));
+    }
+  });
+})();
+</script>
+
+<p>
+  <a class="dlBtn" href="./index.html">← サイトトップへ戻る</a>
+
+</p>
+</body>
+</html>

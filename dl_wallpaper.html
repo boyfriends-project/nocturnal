@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+
+<!-- フォント読み込み -->
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
+
+<title>特典DLページ</title>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-587TGTD330"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-587TGTD330');
+</script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #ddd6fe;
+      color: #4b3f72;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 20px; }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    .gallery img {
+      width: 100%;
+      max-width: 200px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .gallery img:hover {
+      transform: scale(1.05);
+    }
+ .modal{
+  display: none;              /* ← 初期は非表示 */
+  position: fixed;
+  z-index: 999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;    /* ← ここはopen時に効く */
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+}
+.modal.open{
+  display: flex;              /* ← 開く時だけ表示 */
+}
+    .modal img {
+      max-width: 90%;
+      max-height: 70%;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+    #close {
+      position: absolute;
+      top: 20px; right: 40px;
+      font-size: 40px;
+      color: #fff;
+      cursor: pointer;
+    }
+#download,
+.dlBtn{
+      appearance:none;border:0;border-radius:8px;padding:10px 14px;
+      background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
+      display:inline-flex;gap:5px;align-items:center;box-shadow:0 4px 14px rgba(255,77,141,.35)
+    }
+#download:hover,
+.dlBtn:hover {
+  background: #e73370;
+}
+.bulk-download{margin:14px 0 22px}
+.bulk-download .dlBtn{display:inline-flex;align-items:center;gap:.5rem}
+
+  </style>
+
+</head>
+<body>
+  <h1>スマホ用壁紙DLページ</h1>
+
+<div class="bulk-download">
+  <a id="download" href="./images/dl/wallpapers.zip" download>
+    📦 壁紙20枚をまとめてダウンロード
+  </a>
+</div>
+
+  <!-- サムネ一覧 -->
+  <div class="gallery">
+    <img src="./images/god/ルビー神.webp" data-full="./images/dl/紅焔の戦神アグニオス.webp" alt="神さま01" loading="lazy">
+    <img src="./images/god/セレナイト神.webp" data-full="./images/dl/月光の導神セレヴィス.webp" alt="神さま02" loading="lazy">
+<img src="./images/god/サファイア神.webp" data-full="./images/dl/夢紡ぎの幻神ノクティス.webp" alt="神さま03" loading="lazy">
+    <img src="./images/god/アンバー神.webp" data-full="./images/dl/海皇神ナギノミコト.webp" alt="神さま04" loading="lazy">
+    <img src="./images/god/ガーネット神.webp" data-full="./images/dl/契約の冥王タナクリス.webp" alt="神さま05" loading="lazy">
+
+    <img src="./images/god/ホワイトラブラドライト神.webp" data-full="./images/dl/光虹の橋神グリムルスト.webp" alt="神さま06" loading="lazy">
+    <img src="./images/god/ラリマー神.webp" data-full="./images/dl/蒼環の守帝エリュシオン.webp" alt="神さま07" loading="lazy">
+
+<img src="./images/god/トパーズ神.webp" data-full="./images/dl/陽翔の聖神ヘリオディス.webp" alt="神さま08" loading="lazy">
+    <img src="./images/god/レッドコーラル神.webp" data-full="./images/dl/海哭の大神司ジュンユー.webp" alt="神さま09" loading="lazy">
+    <img src="./images/god/パール神.webp" data-full="./images/dl/天珠の龍神ユンロン.webp" alt="神さま10" loading="lazy">
+
+    <img src="./images/god/アクアマリン神.webp" data-full="./images/dl/深碧の導星エドワルド.webp" alt="神さま11" loading="lazy">
+    <img src="./images/god/イエローカルサイト神.webp" data-full="./images/dl/道拓の神カジノミコト.webp" alt="神さま12" loading="lazy">
+<img src="./images/god/インカローズ神.webp" data-full="./images/dl/紅誓の覇将軍ハオラン.webp" alt="神さま13" loading="lazy">
+    <img src="./images/god/ムーンストーン神.webp" data-full="./images/dl/星環の星神アストリオス.webp" alt="神さま14" loading="lazy">
+    <img src="./images/god/ラピスラズリ神.webp" data-full="./images/dl/賢翼の空神オルニクス.webp" alt="神さま15" loading="lazy">
+
+    <img src="./images/god/タイガーアイ神.webp" data-full="./images/dl/虎眼の覇神レグナス.webp" alt="神さま16" loading="lazy">
+    <img src="./images/god/レッドカーネリアン神.webp" data-full="./images/dl/光響の歌神ミカヅオト.webp" alt="神さま17" loading="lazy">
+
+<img src="./images/god/ロッククリスタル神.webp" data-full="./images/dl/氷鏡の大霊ヴェリミール.webp" alt="神さま18" loading="lazy">
+    <img src="./images/god/セレスタイト神.webp" data-full="./images/dl/轟天の雷帝ライホウ.webp" alt="神さま19" loading="lazy">
+    <img src="./images/god/シトリン神.webp" data-full="./images/dl/皇神ヒカリカゲノミコト.webp" alt="神さま20" loading="lazy">
+    <!-- 必要な分だけ追加 -->
+  </div>
+<p>※この壁紙は「WebP形式」です。ほぼすべてのスマホで通常の壁紙と同じように使えます。<br>
+もし古い端末で使えない場合は、PNGに変換してお試しください。</p>
+
+
+  <!-- モーダル -->
+  <div id="modal" class="modal">
+    <span id="close">&times;</span>
+    <img id="modal-img" src="" alt="">
+    <a id="download" href="" download>📥 ダウンロード</a>
+  </div>
+
+  <script>
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modal-img");
+const downloadLink = document.getElementById("download");
+
+function openModal(previewSrc, fullSrc){
+  modal.classList.add("open");
+  modalImg.src = previewSrc || fullSrc;
+  downloadLink.href = fullSrc;
+  document.body.style.overflow = "hidden"; // 背景スクロール止める（任意）
+}
+function closeModal(){
+  modal.classList.remove("open");
+  modalImg.src = "";                          // メモリ解放
+  document.body.style.overflow = "";          // スクロール復帰
+}
+
+document.querySelectorAll(".gallery img").forEach(img => {
+  img.addEventListener("click", () => {
+    openModal(img.dataset.preview, img.dataset.full);
+  });
+});
+
+document.getElementById("close").addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) closeModal();       // 背景タップで閉じる
+});
+
+</script>
+
+<p>
+  <a class="dlBtn" a href="dl_music.html">ToneのDLページへ行く</a>
+</p>
+
+</body>
+</html>

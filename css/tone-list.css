@@ -1,0 +1,19 @@
+/* tone-list.css  ─  “心の音” 一覧ページ専用の上書き */
+
+.tone-list{
+  /* 一覧全体の文字を少しだけ縮小 */
+  font-size: 0.95rem;   /* ← 1rem=16px の 95% に */
+}
+
+/* 各タイトル行（N1. アウロラ…）をスマホ基準で小さめに */
+.tone-list .tone-item h2{
+  font-size: clamp(0.9rem, 3.4vw, 1rem);
+  /*            最小       画面幅対応   最大 */
+  line-height: 1.4;
+}
+
+/* オプション：説明文や注意書きも合わせて微調整したい場合 */
+.tone-list p,
+.tone-list .note{
+  font-size: 0.9rem;
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+<!-- フォント読み込み -->
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
+
+<title>特典DLページ</title>
+
+<style>
+    :root {
+      --bg:#ddd6fe; --fg:#4b3f72; --acc:#e0aaff; --muted:#4b3f72;
+      --card:#f8f7fb;
+    }
+    body{
+margin:0;font-family: "Zen Kaku Gothic New", 
+system-ui, 
+sans-serif;
+background:var(--bg);
+color:var(--fg);
+}
+
+ h1 { 
+      margin-bottom: 20px;
+      text-align: center;
+      font-family: sans-serif;
+      background: #ddd6fe;
+      color: #4b3f72;
+      text-align: center;
+      margin: 0;
+ }
+p { text-align: center;
+}
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .wrap{max-width:960px;margin:auto;padding:24px}
+    h1{font-size:clamp(20px,3.8vw,28px);margin:0 0 12px}
+    .lead{color:var(--muted);margin:0 0 20px;font-size:14px}
+    /* レスポンシブ・グリッド */
+    .toneGrid{
+      display:grid;gap:16px;
+      grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+    }
+    .toneCard{
+      background:var(--card);border-radius:14px;padding:14px 14px 12px;
+      box-shadow:0 6px 24px rgba(0,0,0,.25);
+    }
+    .toneTitle{margin:0 0 8px;font-weight:700;font-size:16px}
+    audio{width:100%;height:40px}
+    .actions{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin-top:10px}
+    .dlBtn{
+      appearance:none;border:0;border-radius:8px;padding:10px 14px;
+      background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
+      display:inline-flex;gap:5px;align-items:center;box-shadow:0 4px 14px rgba(255,77,141,.35)
+    }
+    .size{font-size:12px;color:var(--muted)}
+    /* スマホ余白最適化 */
+    @media (max-width:480px){
+      .wrap{padding:18px}
+      .toneTitle{font-size:15px}
+    }
+.bulk-download{margin:14px 0 22px}
+.bulk-download {display:inline-flex;align-items:center;gap:.5rem}
+
+#download:hover,
+.dlBtn:hover {
+  background: #e73370;
+}
+
+  </style>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-587TGTD330"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-587TGTD330');
+</script>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  
+</head>
+
+<body>
+
+ <main class="wrap" id="toneDL">
+
+    <h1>心の音（Tone）DLページ</h1>
+    <p class="lead">三点メニューの「ダウンロード」でも保存できます。通信量にご注意ください。</p>
+
+<div class="bulk-download">
+  <a class="dlBtn" href="./audio/tone_all.zip" download>
+    🎵 音楽13曲をまとめてダウンロード
+  </a>
+</div>
+    <div class="toneGrid" id="toneGrid"></div>
+  </main>
+
+<!-- このページ専用JS（IIFEで外部へ漏らさない） -->
+  <script>
+function formatFileSize(bytes){ return `${(bytes/1024/1024).toFixed(2)} MB`; }
+async function getFileSize(url){
+  const r = await fetch(url,{method:"HEAD"});
+  const s = r.headers.get("Content-Length");
+  return s ? formatFileSize(+s) : "サイズ不明";
+}
+
+// 例：トーンカード作成時に使う
+const AUDIO_BASE = "./audio";
+
+    const tones = [
+      { no:1,  name:"アウロラ",   meaning:"夜明け" },
+      { no:2,  name:"ヴァリオン", meaning:"チャレンジ" },
+      { no:3,  name:"エクスパンサ", meaning:"広がり" },
+      { no:4,  name:"クエストラ", meaning:"探求" },
+      { no:5,  name:"ルーミナ",   meaning:"輝き" },
+      { no:6,  name:"エクイリア", meaning:"調和" },
+      { no:7,  name:"ミスティア", meaning:"神秘" },
+      { no:8,  name:"フルーラ",   meaning:"流れ" },
+      { no:9,  name:"メンターラ", meaning:"導師" },
+      { no:10, name:"テンプレア", meaning:"調律" },
+      { no:11, name:"リベリア",   meaning:"解放" },
+      { no:12, name:"ネクサリア", meaning:"結び" },
+      { no:13, name:"パルフェリア", meaning:"完成" },
+    ];
+
+    const grid = document.getElementById("toneGrid");
+
+tones.forEach(t=>{
+  const src = `${AUDIO_BASE}/tone${t.no}.mp3`;
+
+  const card = document.createElement("section");
+  card.className = "toneCard";
+  card.innerHTML = `
+    <h2 class="toneTitle">№${t.no}. ${t.name} ♬ ${t.meaning}</h2>
+    <audio controls preload="none" src="${src}"></audio>
+    <div class="actions">
+      <a class="dlBtn" href="${src}" download>📥 ダウンロード</a>
+      <span class="fileSize">計測中…</span>
+    </div>`;
+  grid.appendChild(card);                 // ← ここで順番に追加
+
+  // サイズはあとで埋める
+  getFileSize(src).then(size=>{
+    card.querySelector(".fileSize").textContent = size;
+  }).catch(()=>{ card.querySelector(".fileSize").textContent = "サイズ不明"; });
+});
+</script>
+
+<p>
+  <a class="dlBtn" a href="dl_wallpaper.html">待ち受け画像のDLページへ行く</a>
+</p>
+</body>
+</html>

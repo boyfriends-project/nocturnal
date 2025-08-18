@@ -1,0 +1,40 @@
+body {
+  background: #f8f7fb;
+  color: #4b3f72;
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  text-align: center;
+}
+
+.char-title {
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+
+.char-icons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.char-icons img {
+  width: 100%;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.char-icons img:hover {
+  transform: scale(1.05);
+}
+
+.char-detail {
+  margin-top: 1rem;
+}
+.char-detail img {
+  max-width: 90vw;
+  height: auto;
+  border-radius: 12px;
+}
+.hidden {
+  display: none;
+}

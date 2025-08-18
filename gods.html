@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>神さま一覧</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#efe9ff; --fg:#2b2b36; --muted:#6b6b7a; --card:#fff; }
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:"Zen Kaku Gothic New",system-ui,sans-serif}
+  .wrap{max-width:1100px;margin:auto;padding:24px}
+  h1{margin:0 0 12px;font-size:clamp(22px,3.6vw,32px);text-align:center}
+  .lead{margin:0 0 18px;text-align:center;color:var(--muted);font-size:14px}
+
+  /* グリッド一覧 */
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+  .card{background:var(--card);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:12px;text-align:center}
+  .thumb{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px}
+  .name{margin:8px 0 4px;font-weight:700}
+  .sub{margin:0;color:var(--muted);font-size:12px}
+  .desc{margin:8px 0 0;font-size:13px;line-height:1.5;color:#3f3f4a;text-align:left}
+
+p { text-align: center;
+}
+    .dlBtn{
+      appearance:none;border:0;border-radius:8px;padding:10px 14px;
+      background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
+      display:inline-flex;gap:5px;align-items:center;box-shadow:0 4px 14px rgba(255,77,141,.35)
+    }
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* スマホは2列固定にしたい場合 */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+   
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>守護神一覧</h1>
+  <p class="lead"></p>
+  <div id="grid" class="grid"></div>
+</main>
+
+<script>
+(() => {
+  // 画像の置き場所（サムネ）。必要に応じて変えてね
+  const THUMBS_BASE = "./images/god"; // 600px WebP推奨
+
+  // 表示データ（例）— ここに20柱ぶん追加
+  const GODS = [
+    { id:1,  name:"ルビー", file:"ルビー神",
+      desc:"不屈の情熱と真っ直ぐな心を持つ戦神" },
+    { id:2,  name:"セレナイト", file:"セレナイト神",
+      desc:"四頭の四頭の白馬を駆って月を運ぶ優しき神" },
+    { id:3,  name:"サファイア", file:"サファイア神",
+      desc:"星々の間で人々の夢を紡ぐ神" },
+　　{ id:4,  name:"アンバー", file:"アンバー神",
+      desc:"深海の底で海の生命を司る神" },
+    { id:5,  name:"ガーネット", file:"ガーネット神",
+      desc:"命の旅立ちと再会を見守る冥府の神" },
+    { id:6,  name:"ホワイトラブラドライト", sub:"", file:"ホワイトラブラドライト神",
+      desc:"神々の国と人間の国を繋ぎなおした守護神" },
+    { id:7,  name:"ラリマー", file:"ラリマー神",
+      desc:"海の底に沈んだ幻の大陸を守る神" },
+    { id:8,  name:"トパーズ", file:"トパーズ神",
+      desc:"邪龍を討ち天空の船で太陽を運ぶ神" },
+    { id:9,  name:"レッドコーラル", file:"レッドコーラル神",
+      desc:"西方の神殿で神に仕えた美しき大神司" },
+　　{ id:10,  name:"パール", file:"パール神",
+      desc:"「夜光真珠」という神秘の宝玉を護る龍神" },
+    { id:11,  name:"アクアマリン", file:"アクアマリン神",
+      desc:"大海賊として名を馳せるも伝説を追いかけ導星となった神" },
+    { id:12,  name:"イエローカルサイト", file:"イエローカルサイト神",
+      desc:"太陽の位置を測り星の導きを得て道を拓いた神" },
+    { id:13,  name:"インカローズ", file:"インカローズ神",
+      desc:"皇帝の血を引きながらも忠臣として仕え覇将軍となった神" },
+    { id:14,  name:"ムーンストーン",  file:"ムーンストーン神",
+      desc:"星や星座・闇を司り日ごとに月の光を捧げる神" },
+    { id:15,  name:"ラピスラズリ",  file:"ラピスラズリ神",
+      desc:"高みから全体を見通し勝利へと導く翼の神" },
+　　{ id:16,  name:"タイガーアイ", file:"タイガーアイ神",
+      desc:"数々の戦いに勝利し勇気と戦いを司る覇神" },
+    { id:17,  name:"レッドカーネリアン", file:"レッドカーネリアン神",
+      desc:"響きの力で命のリズムを刻む楽器と歌の神" },
+    { id:18,  name:"ロッククリスタル",  file:"ロッククリスタル神",
+      desc:"真実の扉を通し神々の言葉を人々に伝える大霊" },
+　　{ id:19,  name:"セレスタイト", file:"セレスタイト神",
+      desc:"嵐と雷を司り大地に恵みと豊かさをもたらす神" },
+    { id:20,  name:"シトリン", file:"シトリン神",
+      desc:"光と影を司り日の昇る国で神々を率いる神" },
+
+
+    // ... id:4〜20 を同形式で追加（fileはサムネのファイル名）
+  ];
+
+  const grid = document.getElementById("grid");
+  GODS.forEach(g => {
+    const card = document.createElement("section");
+    card.className = "card";
+    const thumb = `${THUMBS_BASE}/${g.file}.webp`; // 拡張子が違うならここを変更
+    card.innerHTML = `
+      <img class="thumb" src="${thumb}" alt="${g.name}" loading="lazy">
+      <p class="name">${g.name}</p>
+      <p class="sub">${g.sub ?? ""}</p>
+      <p class="desc">${g.desc ?? ""}</p>
+    `;
+    grid.appendChild(card);
+  });
+})();
+</script>
+
+<p>
+  <a class="dlBtn" href="./index.html">← サイトトップへ戻る</a>
+
+</p>
+
+</body>
+</html>
