@@ -21,7 +21,7 @@ toneList.forEach(tone => {
   section.className = 'tone-item';
   section.innerHTML = `
     <h2>№${tone.no}. ${tone.name}♬${tone.meaning}</h2>
-    <audio controls preload="none" src="../audio/tone${tone.no}_preview.mp3"></audio>
+    <audio controls preload="none" src="audio/tone${tone.no}_preview.mp3"></audio>
   `;
   container.appendChild(section);
 });
