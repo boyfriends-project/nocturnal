@@ -107,12 +107,25 @@
 }
 
   /* ===== ボタン（既存デザイン踏襲） ===== */
-  .dlBtn{
-    appearance:none;border:0;border-radius:8px;padding:10px 14px;
-    background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
-    display:inline-flex;gap:5px;align-items:center;
-    box-shadow:0 4px 14px rgba(255,77,141,.35)
-  }
+.dlBtn{
+  appearance:none;
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  background:#c4a3ff;
+  color:#fff;
+  font-weight:700;
+  text-decoration:none;
+  display:inline-flex;
+  gap:5px;
+  align-items:center;
+  box-shadow:0 4px 14px rgba(255,77,141,.35);
+}
+
+/* クリック中や処理中（pointer-events:none が付与された時）の見た目 */
+.dlBtn[style*="pointer-events: none"] {
+  opacity: .85;
+}
   .dlBtn:hover{ background:#e73370; }
   .dlBtn.disabled{ pointer-events:none; opacity:.6; }
 
@@ -124,6 +137,11 @@
   @media (max-width: 480px){
     body{ padding: 16px; }
   }
+.dlBtn.disabled {
+  pointer-events: none;
+  opacity: .85;
+}
+
 </style>
 
 
@@ -264,6 +282,28 @@
       if (!ok) window.open(url, "_blank");
     }, { passive:false });
   }
+
+
+// ① クリックしたら数秒だけメッセージを出す小さなヘルパー
+function attachDLFeedback(a){
+  if (!a) return;
+  a.addEventListener("click", () => {
+    // 既に表示中なら重ねない
+    if (a.dataset.busy === "1") return;
+    const label = a.textContent;
+    a.dataset.busy = "1";
+    a.textContent = "✅ ダウンロード開始（通知/ファイルアプリを確認）";
+    a.classList.add("disabled");
+setTimeout(() => {
+  a.textContent = label;
+  a.classList.remove("disabled");   // ← disabledクラスを外して元に戻す
+}, 1500);
+  }, { passive: true });
+}
+
+// ② モーダル内ボタンと、（あれば）まとめDLのボタンにも付与
+attachDLFeedback(document.getElementById("modal-download"));
+document.querySelectorAll(".bulk-download .dlBtn").forEach(attachDLFeedback);
 </script>
 
 <p>

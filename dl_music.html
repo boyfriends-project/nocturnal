@@ -52,12 +52,26 @@ p { text-align: center;
     .toneTitle{margin:0 0 8px;font-weight:700;font-size:16px}
     audio{width:100%;height:40px}
     .actions{display:flex;gap:10px;align-items:center;justify-content:flex-start;margin-top:10px}
-    .dlBtn{
-      appearance:none;border:0;border-radius:8px;padding:10px 14px;
-      background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
-      display:inline-flex;gap:5px;align-items:center;box-shadow:0 4px 14px rgba(255,77,141,.35)
-    }
-    .size{font-size:12px;color:var(--muted)}
+.dlBtn{
+  appearance:none;
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  background:#c4a3ff;
+  color:#fff;
+  font-weight:700;
+  text-decoration:none;
+  display:inline-flex;
+  gap:5px;
+  align-items:center;
+  box-shadow:0 4px 14px rgba(255,77,141,.35);
+}
+
+/* クリック中や処理中（pointer-events:none が付与された時）の見た目 */
+.dlBtn[style*="pointer-events: none"] {
+  opacity: .85;
+}
+.size{font-size:12px;color:var(--muted)}
     /* スマホ余白最適化 */
     @media (max-width:480px){
       .wrap{padding:18px}
@@ -69,6 +83,10 @@ p { text-align: center;
 #download:hover,
 .dlBtn:hover {
   background: #e73370;
+}
+.dlBtn.disabled {
+  pointer-events: none;
+  opacity: .85;
 }
 
   </style>
@@ -146,6 +164,23 @@ const tones = [
   { no:13, name:"パルフェリア", meaning:"完成" },
 ];
 
+/* ---- フィードバック関数 ---- */
+function attachDLFeedback(a){
+  if (!a) return;
+  a.addEventListener("click", () => {
+    if (a.dataset.busy === "1") return;
+    const label = a.textContent;
+    a.dataset.busy = "1";
+    a.textContent = "✅ ダウンロード開始（通知/ファイルアプリを確認）";
+    a.style.pointerEvents = "none";
+    setTimeout(() => {
+      a.textContent = label;
+      a.style.pointerEvents = "";
+      delete a.dataset.busy;
+    }, 2500);
+  }, { passive: true });
+}
+
 /* ---- 描画 ---- */
 const grid = document.getElementById("toneGrid");
 
@@ -163,6 +198,9 @@ tones.forEach(t=>{
     </div>`;
   grid.appendChild(card);
 
+  // ← この直後が「カード生成後」
+  const a = card.querySelector(".dlBtn");
+
   // ファイルサイズ表示
   getFileSize(src).then(size=>{
     card.querySelector(".fileSize").textContent = size;
@@ -170,15 +208,15 @@ tones.forEach(t=>{
     card.querySelector(".fileSize").textContent = "サイズ不明";
   });
 
-  // ローカル環境だけ：DLリンクの遷移を止めてBlob保存を試行
+  // フィードバック付与（本番/ローカル共通）
+  attachDLFeedback(a);
+
+  // ローカル環境だけ：遷移を止めてBlob保存を試行
   if (!isProd && isLocalLike) {
-    const a = card.querySelector(".dlBtn");
     a.addEventListener("click", async (e)=>{
       e.preventDefault();
       const url = a.href;
       const name = fileNameFrom(url);
-
-      // 保存を試す → 失敗なら新規タブで表示
       try {
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -192,12 +230,40 @@ tones.forEach(t=>{
         tmp.remove();
         URL.revokeObjectURL(blobUrl);
       } catch (err) {
-        // CORS等で保存できない場合は閲覧用に開く
         window.open(url, "_blank");
       }
     }, { passive:false });
   }
 });
+
+// まとめDLボタンにもフィードバックを付与
+document.querySelectorAll('.bulk-download .dlBtn').forEach(attachDLFeedback);
+
+// まとめDLのローカル時フォールバック（任意）
+if (!isProd && isLocalLike) {
+  document.querySelectorAll('.bulk-download .dlBtn[href]').forEach(a => {
+    a.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const url = a.href;
+      const name = fileNameFrom(url, 'tone_all.zip');
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const tmp = document.createElement('a');
+        tmp.href = blobUrl;
+        tmp.download = name;
+        document.body.appendChild(tmp);
+        tmp.click();
+        tmp.remove();
+        URL.revokeObjectURL(blobUrl);
+      } catch {
+        window.open(url, '_blank');
+      }
+    }, { passive:false });
+  });
+}
 </script>
 
 <p>
