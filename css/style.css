@@ -471,27 +471,6 @@ word-break: break-word;     /* ← 日本語の途中でも折り返しOKに！ 
 }
 
 
-/* --- 心の音一覧ページ --------------------------- */
-.tone-list {
-  max-width: 720px;
-  margin: 2rem auto;
-  padding: 1rem;
-}
-
-.tone-item {
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background-color: #f9f5ff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.tone-item h2 {
-  margin-bottom: 0.5rem;
-  color: #8000d6;
-  font-size: 1.1rem;
-}
-
 /* --- TOPに戻るボタン --------------------------- */
 .back-to-top {
   text-align: center;
