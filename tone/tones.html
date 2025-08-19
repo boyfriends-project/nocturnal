@@ -1,11 +1,55 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>心の音一覧</title>
-<link rel="stylesheet" href="../css/style.css">     <!-- 共通 -->
-<link rel="stylesheet" href="../css/tone-list.css"> <!-- 一覧ページ専用 -->
-<base href="https://boyfriends-project.github.io/nocturnal/">
+
+  <script>
+    // 本番かローカルかを判定
+    const isLocal =
+      location.hostname === "localhost" ||
+      location.hostname === "127.0.0.1" ||
+      location.protocol === "file:";
+
+    // 本番では <base> を注入して、/nocturnal/ 基準にする
+    if (!isLocal) {
+      const base = document.createElement("base");
+      base.href = "https://boyfriends-project.github.io/nocturnal/";
+      document.head.appendChild(base);
+    }
+
+    // CSS/JS を安全に追加するヘルパ
+    function loadCSS(href) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = href;
+      document.head.appendChild(link);
+    }
+    function loadScript(src) {
+      const s = document.createElement("script");
+      s.src = src;
+      s.defer = true; // DOM構築後に実行
+      document.body.appendChild(s);
+    }
+
+    // パスを分岐
+    if (isLocal) {
+      // ローカル（tone.html は tone/ 配下なので 1つ上へ）
+      loadCSS("../css/style.css");
+      loadCSS("../css/tone-list.css");
+      // tones.js がプロジェクト直下にある前提
+      window.addEventListener("DOMContentLoaded", () => {
+        loadScript("../tones.js");
+      });
+    } else {
+      // 本番（<base>により /nocturnal/ 基準で解決）
+      loadCSS("css/style.css");
+      loadCSS("css/tone-list.css");
+      window.addEventListener("DOMContentLoaded", () => {
+        loadScript("tones.js");
+      });
+    }
+  </script>
 </head>
 <body>
   <main class="tone-list">
@@ -13,9 +57,6 @@
 <p>この「心の音」は、あなたの内に秘められた響きの一片―<br>
 フルバージョンは、<a href="https://lin.ee/j2byiZf"
      target="_blank" rel="noopener">BOYFRIENDS公式LINE</a>でゆっくりお聴きいただけます。
-<!-- LINE友達追加 -->
-<div class="line-it-button" data-lang="ja" data-type="friend" data-env="REAL"   data-lineId="@lineteamjp" style="display: none;"></div>
-<script src="https://www.line-website.com/social-plugins/js/thirdparty/loader.min.js" async="async" defer="defer"></script>
 </p>
 
 <div id="tone-container"></div>
