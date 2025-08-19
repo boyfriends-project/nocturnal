@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ダウンロードページ</title>
+<base href="https://boyfriends-project.github.io/nocturnal/">
+
+<style>
+  :root{
+    --bg:#f7f4ff; --fg:#3b2f5e; --acc:#6c5ce7; --acc2:#9b8eff;
+    --muted:#6b6b6b; --card:#ffffff; --warnBg:#fff3cd; --warnBd:#ffecb5; --warnFg:#664d03;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+      "Hiragino Kaku Gothic ProN","Noto Sans JP", sans-serif;
+  }
+  .wrap{max-width:960px;margin:auto;padding:24px}
+  h1{font-size:clamp(20px,4.5vw,28px);margin:6px 0 14px;text-align:center}
+  .lead{color:var(--muted);text-align:center;margin:0 0 16px;font-size:14px}
+
+  .note{
+    display:none;
+    background:var(--warnBg); color:var(--warnFg);
+    border:1px solid var(--warnBd); border-radius:12px;
+    padding:12px 14px; font-size:14px; margin:10px 0 18px
+  }
+
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{
+    background:var(--card); border-radius:16px; padding:18px;
+    box-shadow:0 6px 22px rgba(0,0,0,.12)
+  }
+  .card h2{margin:0 0 10px;font-size:18px}
+  .help{font-size:12px;color:var(--muted);margin-top:8px}
+
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .btn{
+    appearance:none; border:0; border-radius:10px; cursor:pointer;
+    background:var(--acc); color:#fff; font-weight:700;
+    padding:12px 14px; display:inline-flex; gap:.5rem; align-items:center;
+    text-decoration:none; box-shadow:0 4px 14px rgba(108,92,231,.25)
+  }
+  .btn.secondary{ background:var(--acc2) }
+  .btn:disabled{ opacity:.6; pointer-events:none }
+  .mini{ font-size:12px; color:var(--muted); margin-top:12px }
+
+  @media (max-width:480px){
+    .wrap{padding:18px}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>ダウンロードページ</h1>
+
+
+  <div id="lineNote" class="note">
+    LINEアプリ内では保存できないことがあります。<br/>
+    下の「Chrome / Safari で開く」ボタンは、外部ブラウザでの表示を試みます。うまくいかない場合は、画面のメニューから
+    <strong>外部ブラウザ（またはデフォルトのブラウザ）で開く</strong> を選んでください。
+  </div>
+
+  <section class="grid">
+    <article class="card">
+      <h2>待ち受け画像</h2>
+      <div class="row">
+        <a id="btn-wall" class="btn">📷 Chrome / Safari で開く</a>
+        <a class="btn secondary" href="images/dl/wallpapers.zip" download>まとめてダウンロード</a>
+
+      </div>
+      <p class="help">※まとめてダウンロードボタンからは<strong>ZIP形式</strong>でファイルがDLできます。</p>
+    </article>
+
+    <article class="card">
+      <h2>Tone音源</h2>
+      <div class="row">
+        <a id="btn-music" class="btn">🎵 Chrome / Safari で開く</a>
+	<a class="btn secondary" href="audio/tone_all.zip" download>まとめてダウンロード</a>
+      </div>
+
+      <p class="help">※まとめてダウンロードボタンからは<strong>ZIP形式</strong>でファイルがDLできます。</p>
+    </article>
+  </section>
+
+  <p class="mini">
+・うまく保存できない場合は、外部もしくはデフォルトのブラウザ（Chrome / Safari など）でページを開きなおしてから再度お試しください。<br>
+・📦 まとめてダウンロード（ZIP形式）では<strong>ZIP解凍アプリ</strong>が必要な場合があります。<br>　App Store / Google Play などでアプリをご準備の上、ダウンロードして下さい。
+  </p>
+</main>
+
+<script>
+(function(){
+  const UA = navigator.userAgent || "";
+  const isLINE = /Line\//i.test(UA);
+  const isAndroid = /Android/i.test(UA);
+  const isIOS = /iPhone|iPad|iPod/i.test(UA);
+
+  // それぞれの遷移先（必要なら絶対URLに変更可）
+  const urlWall  = "https://boyfriends-project.github.io/nocturnal/dl_wallpaper.html";
+  const urlMusic = "https://boyfriends-project.github.io/nocturnal/dl_music.html";
+
+  // LINE内なら注意ボックス表示
+  if (isLINE) document.getElementById("lineNote").style.display = "block";
+
+  // 外部ブラウザ起動を“試みる”（失敗時は通常URLへフォールバック）
+  function tryOpenExternal(targetUrl){
+    if (isAndroid) {
+      const intentUrl =
+        "intent://" + targetUrl.replace(/^https?:\/\//,'') +
+        "#Intent;scheme=" + (targetUrl.startsWith("https") ? "https" : "http") +
+        ";package=com.android.chrome;end";
+      location.href = intentUrl;
+      setTimeout(() => { location.href = targetUrl; }, 800);
+    } else if (isIOS) {
+      const scheme = targetUrl.startsWith("https") ? "googlechromes://" : "googlechrome://";
+      const chromeUrl = scheme + targetUrl.replace(/^https?:\/\//,'');
+      location.href = chromeUrl;
+      setTimeout(() => { location.href = targetUrl; }, 800);
+    } else {
+      window.open(targetUrl, "_blank");
+    }
+  }
+
+  document.getElementById("btn-wall").addEventListener("click", (e)=>{
+    e.preventDefault(); tryOpenExternal(urlWall);
+  });
+  document.getElementById("btn-music").addEventListener("click", (e)=>{
+    e.preventDefault(); tryOpenExternal(urlMusic);
+  });
+})();
+</script>
+</body>
+</html>
