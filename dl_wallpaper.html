@@ -23,78 +23,117 @@
 
 
   <style>
-    body {
-      font-family: sans-serif;
-      background: #ddd6fe;
-      color: #4b3f72;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 { margin-bottom: 20px; }
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-    }
-    .gallery img {
-      width: 100%;
-      max-width: 200px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .gallery img:hover {
-      transform: scale(1.05);
-    }
- .modal{
-  display: none;              /* ← 初期は非表示 */
+  body {
+    font-family: sans-serif;
+    background: #ddd6fe;
+    color: #4b3f72;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 { margin-bottom: 20px; }
+
+  .gallery{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  .gallery img{
+    width: 100%;
+    max-width: 200px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform .2s;
+  }
+  .gallery img:hover{ transform: scale(1.05); }
+
+  /* ===== モーダル（中央ズレ対策・安全領域対応） ===== */
+.modal{
+  display: none;
   position: fixed;
+  inset: 0;
   z-index: 999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
   background: rgba(0,0,0,0.9);
-  justify-content: center;    /* ← ここはopen時に効く */
+  box-sizing: border-box;
+  padding: max(12px, env(safe-area-inset-top))
+           max(12px, env(safe-area-inset-right))
+           max(12px, env(safe-area-inset-bottom))
+           max(12px, env(safe-area-inset-left));
+  justify-content: center; /* 中央寄せ */
   align-items: center;
+}
+ .modal.open{
+  display: flex;   /* Flexboxで中央配置 */
+}
+/* 画像＋DLボタンを縦にまとめるコンテナ */
+.modal-content{
+  display: flex;
   flex-direction: column;
-  padding: 20px;
+  align-items: center;
+  gap: 14px;       /* 画像とボタンの間隔 */
+  max-height: 90vh;
 }
-.modal.open{
-  display: flex;              /* ← 開く時だけ表示 */
-}
-    .modal img {
-      max-width: 90%;
-      max-height: 70%;
-      margin-bottom: 20px;
-      border-radius: 10px;
-    }
-    #close {
-      position: absolute;
-      top: 20px; right: 40px;
-      font-size: 40px;
-      color: #fff;
-      cursor: pointer;
-    }
-/* 既存の #download, .dlBtn へのスタイルは .dlBtn に統一推奨 */
-.dlBtn{
-  appearance:none;border:0;border-radius:8px;padding:10px 14px;
-  background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
-  display:inline-flex;gap:5px;align-items:center;box-shadow:0 4px 14px rgba(255,77,141,.35)
-}
-.dlBtn:hover{ background:#e73370; }.bulk-download{margin:14px 0 22px}
-.bulk-download .dlBtn{display:inline-flex;align-items:center;gap:.5rem}
 
-.dlBtn.disabled { pointer-events: none; opacity: .6; }
+.modal-content img{
+  max-width: 92vw;
+  max-height: 75vh;   /* 画像は画面に収まるよう調整 */
+  border-radius: 10px;
+  object-fit: contain;
+}
+  .modal img{
+    display: block;
+    max-width: min(92vw, 1200px);
+    max-height: 76vh;        /* 画面に収まる高さ */
+    height: auto;
+    margin: 0;               /* 余白が中心計算に影響しないように */
+    border-radius: 10px;
+    object-fit: contain;
+  }
 
-  </style>
+  /* 閉じるボタンはレイアウトに影響させない（固定配置） */
+  #close{
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    font-size: 40px;
+    color: #fff;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* モーダル内のDLボタンは中央下に自然に配置 */
+  #modal-download{
+  margin: 0; /* 下すぎないように余白リセット */
+}
+
+  /* ===== ボタン（既存デザイン踏襲） ===== */
+  .dlBtn{
+    appearance:none;border:0;border-radius:8px;padding:10px 14px;
+    background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
+    display:inline-flex;gap:5px;align-items:center;
+    box-shadow:0 4px 14px rgba(255,77,141,.35)
+  }
+  .dlBtn:hover{ background:#e73370; }
+  .dlBtn.disabled{ pointer-events:none; opacity:.6; }
+
+  .bulk-download{ margin:14px 0 22px; }
+  .bulk-download .dlBtn{ display:inline-flex;align-items:center;gap:.5rem; }
+
+  .lead{ color:var(--muted); margin:0 0 20px; font-size:14px; }
+
+  @media (max-width: 480px){
+    body{ padding: 16px; }
+  }
+</style>
+
 
 <base href="https://boyfriends-project.github.io/nocturnal/">
 
 </head>
 <body>
   <h1>スマホ用壁紙DLページ</h1>
-※保存したい場合は、画面のメニューから「外部ブラウザで開く」や「デフォルトのブラウザで開く」（iPhoneは「Safariで開く」） を選んでください。<br>
 
+    <p class="lead">📦 まとめてダウンロード（ZIP形式）では<strong>ZIP解凍アプリ</strong>が必要な場合があります。<br>　App Store / Google Play などでアプリをご準備の上、ダウンロードして下さい。</p>
 
 <div class="bulk-download">
   <a id="bulk-download" class="dlBtn"
@@ -138,62 +177,44 @@
 
   <!-- モーダル -->
   <div id="modal" class="modal">
-    <span id="close">&times;</span>
+  <span id="close">&times;</span>
+  <div class="modal-content">
     <img id="modal-img" src="" alt="">
-    <a id="modal-download" class="dlBtn" href="" download>📥 ダウンロード</a>
+    <a id="modal-download" class="dlBtn" href="#" download>📥 ダウンロード</a>
+  </div>
 </div>
 
 <script>
   const modal = document.getElementById("modal");
   const modalImg = document.getElementById("modal-img");
-  const modalDownload = document.getElementById("modal-download"); // モーダル内のDLボタン
+  const modalDownload = document.getElementById("modal-download");
   const closeBtn = document.getElementById("close");
 
-  // 文字化けを避けてファイル名を作る
+  // 環境判定
+  const isProd = /boyfriends-project\.github\.io$/i.test(location.hostname);
+  const isLocalLike =
+    location.protocol === "file:" ||
+    location.hostname === "localhost" ||
+    location.hostname === "127.0.0.1" ||
+    location.hostname === "";
+
   function fileNameFrom(path, fallback="wallpaper.webp"){
     try {
-      const name = decodeURIComponent(path.split('/').pop() || "");
+      const name = decodeURIComponent((path.split('/').pop()||"").split("?")[0]);
       return name || fallback;
-    } catch {
-      return fallback;
-    }
-  }
-
-  // 404簡易チェック（任意）
-  async function exists(url){
-    try {
-      const res = await fetch(url, { method: "HEAD", cache: "no-store" });
-      return res.ok;
-    } catch { return false; }
-  }
-
-  // ★どのブラウザでもダウンロードさせる関数（Blob経由）
-  async function forceDownload(url, filename){
-    const res = await fetch(url, { cache: "no-store" });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const blob = await res.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = blobUrl;
-    a.download = filename;
-    // iOS対策：同タブでOK。新規タブが必要なら target="_blank" を付ける
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(blobUrl);
+    } catch { return fallback; }
   }
 
   function openModal(previewSrc, fullSrc){
     const src = fullSrc || previewSrc;
-    const safe = encodeURI(src);             // 日本語ファイル名を安全に
+    const safe = encodeURI(src);
     modal.classList.add("open");
     modalImg.src = safe;
 
-    // ボタンの既定href（フォールバックとして残す）
+    // 本番では a[download] に任せる
     modalDownload.href = safe;
     modalDownload.setAttribute("download", fileNameFrom(src));
     modalDownload.textContent = "📥 ダウンロード";
-    modalDownload.classList.remove("disabled");
 
     document.body.style.overflow = "hidden";
   }
@@ -204,39 +225,46 @@
     document.body.style.overflow = "";
   }
 
-  // ギャラリーの画像クリックでモーダルを開く
+  // ギャラリー → モーダル
   document.querySelectorAll(".gallery img").forEach(img => {
     img.addEventListener("click", () => openModal(img.dataset.preview, img.dataset.full));
   });
 
-  // ✨ ここが重要：DLボタンは強制ダウンロードを実行
-  modalDownload.addEventListener("click", async (e) => {
-    // a[href]の既定遷移を止めて、確実にダウンロードさせる
-    e.preventDefault();
-    const url = modalDownload.href;
-    const name = fileNameFrom(url);
-    modalDownload.textContent = "⏳ 準備中…";
-    modalDownload.classList.add("disabled");
-    try {
-      // 存在チェック（任意）
-      if (!(await exists(url))) throw new Error("not-found");
-      await forceDownload(url, name);
-      modalDownload.textContent = "✅ ダウンロード完了";
-    } catch(err){
-      modalDownload.textContent = "⚠️ ダウンロードできません";
-      console.error(err);
-    } finally {
-      setTimeout(() => {
-        modalDownload.textContent = "📥 ダウンロード";
-        modalDownload.classList.remove("disabled");
-      }, 1500);
-    }
-  });
-
   closeBtn.addEventListener("click", closeModal);
   modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-</script>
 
+  // ---- ローカル環境だけ：遷移を止めてBlob保存を“試行”、失敗時は新規タブで表示 ----
+  if (!isProd && isLocalLike) {
+    async function forceDownload(url, filename){
+      // 失敗しやすいので、ダメならフォールバックする
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(blobUrl);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    modalDownload.addEventListener("click", async (e) => {
+      e.preventDefault(); // 遷移を止める（ローカルのみ）
+      const url = modalDownload.href;
+      const name = fileNameFrom(url);
+      // Blob保存を試す → ダメなら新規タブで開く
+      const ok = await forceDownload(url, name);
+      if (!ok) window.open(url, "_blank");
+    }, { passive:false });
+  }
+</script>
 
 <p>
   <a class="dlBtn" href="dl_music.html">ToneのDLページへ行く</a>

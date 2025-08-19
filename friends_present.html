@@ -38,7 +38,11 @@
   .card h2{margin:0 0 10px;font-size:18px}
   .help{font-size:12px;color:var(--muted);margin-top:8px}
 
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .row{
+display:flex;gap:10px;
+flex-wrap:wrap;
+margin-top:10px;
+}
   .btn{
     appearance:none; border:0; border-radius:10px; cursor:pointer;
     background:var(--acc); color:#fff; font-weight:700;
@@ -59,37 +63,38 @@
   <h1>ダウンロードページ</h1>
 
 
-  <div id="lineNote" class="note">
-    LINEアプリ内では保存できないことがあります。<br/>
-    下の「Chrome / Safari で開く」ボタンは、外部ブラウザでの表示を試みます。うまくいかない場合は、画面のメニューから
-    <strong>外部ブラウザ（またはデフォルトのブラウザ）で開く</strong> を選んでください。
-  </div>
+  <div id="lineNote" class="note" style="display:none">
+      LINEアプリ内では保存できないことがあります。<br>
+      ボタンを押すと <strong>外部ブラウザ（Chrome / Safari）で開く</strong>のを試みます。<br>
+      うまくいかない場合は、画面のメニューから「外部ブラウザ（またはデフォルトのブラウザ）で開く」を選んでください。
+    </div>
 
   <section class="grid">
+
     <article class="card">
       <h2>待ち受け画像</h2>
+
       <div class="row">
         <a id="btn-wall" class="btn">📷 Chrome / Safari で開く</a>
-        <a class="btn secondary" href="images/dl/wallpapers.zip" download>まとめてダウンロード</a>
-
+	<a href="dl_wallpaper.html" class="btn secondary">直接開く</a>
+	<div class="help">※直接開くは、すでに外部ブラウザの場合にそのまま開きます。</div>
       </div>
-      <p class="help">※まとめてダウンロードボタンからは<strong>ZIP形式</strong>でファイルがDLできます。</p>
-    </article>
+      
+　    </article>
 
     <article class="card">
       <h2>Tone音源</h2>
       <div class="row">
-        <a id="btn-music" class="btn">🎵 Chrome / Safari で開く</a>
-	<a class="btn secondary" href="audio/tone_all.zip" download>まとめてダウンロード</a>
-      </div>
+        <a id="btn-music" class="btn">🎼 Chrome / Safari で開く</a>
+	<a href="dl_music.html" class="btn secondary">直接開く</a>
+        <div class="help">※LINE内ブラウザでは保存できない場合があります。</div>
+	</div>
 
-      <p class="help">※まとめてダウンロードボタンからは<strong>ZIP形式</strong>でファイルがDLできます。</p>
     </article>
   </section>
 
   <p class="mini">
-・うまく保存できない場合は、外部もしくはデフォルトのブラウザ（Chrome / Safari など）でページを開きなおしてから再度お試しください。<br>
-・📦 まとめてダウンロード（ZIP形式）では<strong>ZIP解凍アプリ</strong>が必要な場合があります。<br>　App Store / Google Play などでアプリをご準備の上、ダウンロードして下さい。
+📦 まとめてダウンロード（ZIP形式）では<strong>ZIP解凍アプリ</strong>が必要な場合があります。App Store / Google Play などでアプリをご準備の上、ダウンロードして下さい。
   </p>
 </main>
 

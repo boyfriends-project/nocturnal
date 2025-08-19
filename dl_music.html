@@ -94,7 +94,7 @@ p { text-align: center;
  <main class="wrap" id="toneDL">
 
     <h1>心の音（Tone）DLページ</h1>
-    <p class="lead">・三点メニューの「ダウンロード」でも保存できます。通信量にご注意ください。</p>
+    <p class="lead">📦 まとめてダウンロード（ZIP形式）では<strong>ZIP解凍アプリ</strong>が必要な場合があります。<br>　App Store / Google Play などでアプリをご準備の上、ダウンロードして下さい。</p>
 
 <div class="bulk-download">
   <a class="dlBtn" href="audio/tone_all.zip" download>
@@ -105,34 +105,49 @@ p { text-align: center;
   </main>
 
 <!-- このページ専用JS（IIFEで外部へ漏らさない） -->
-  <script>
+<script>
+/* ---- 共通ユーティリティ ---- */
 function formatFileSize(bytes){ return `${(bytes/1024/1024).toFixed(2)} MB`; }
 async function getFileSize(url){
   const r = await fetch(url,{method:"HEAD"});
   const s = r.headers.get("Content-Length");
   return s ? formatFileSize(+s) : "サイズ不明";
 }
+function fileNameFrom(path, fallback="download.mp3"){
+  try { return decodeURIComponent((path.split("/").pop()||"").split("?")[0]) || fallback; }
+  catch { return fallback; }
+}
 
-// 例：トーンカード作成時に使う
+/* ---- 環境判定 ---- */
+const isProd = /boyfriends-project\.github\.io$/i.test(location.hostname);
+const isLocalLike =
+  location.protocol === "file:" ||
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1" ||
+  location.hostname === "";
+
+/* ---- 音源パス ---- */
 const AUDIO_BASE = "audio";
 
-    const tones = [
-      { no:1,  name:"アウロラ",   meaning:"夜明け" },
-      { no:2,  name:"ヴァリオン", meaning:"チャレンジ" },
-      { no:3,  name:"エクスパンサ", meaning:"広がり" },
-      { no:4,  name:"クエストラ", meaning:"探求" },
-      { no:5,  name:"ルーミナ",   meaning:"輝き" },
-      { no:6,  name:"エクイリア", meaning:"調和" },
-      { no:7,  name:"ミスティア", meaning:"神秘" },
-      { no:8,  name:"フルーラ",   meaning:"流れ" },
-      { no:9,  name:"メンターラ", meaning:"導師" },
-      { no:10, name:"テンプレア", meaning:"調律" },
-      { no:11, name:"リベリア",   meaning:"解放" },
-      { no:12, name:"ネクサリア", meaning:"結び" },
-      { no:13, name:"パルフェリア", meaning:"完成" },
-    ];
+/* ---- データ ---- */
+const tones = [
+  { no:1,  name:"アウロラ",   meaning:"夜明け" },
+  { no:2,  name:"ヴァリオン", meaning:"チャレンジ" },
+  { no:3,  name:"エクスパンサ", meaning:"広がり" },
+  { no:4,  name:"クエストラ", meaning:"探求" },
+  { no:5,  name:"ルーミナ",   meaning:"輝き" },
+  { no:6,  name:"エクイリア", meaning:"調和" },
+  { no:7,  name:"ミスティア", meaning:"神秘" },
+  { no:8,  name:"フルーラ",   meaning:"流れ" },
+  { no:9,  name:"メンターラ", meaning:"導師" },
+  { no:10, name:"テンプレア", meaning:"調律" },
+  { no:11, name:"リベリア",   meaning:"解放" },
+  { no:12, name:"ネクサリア", meaning:"結び" },
+  { no:13, name:"パルフェリア", meaning:"完成" },
+];
 
-    const grid = document.getElementById("toneGrid");
+/* ---- 描画 ---- */
+const grid = document.getElementById("toneGrid");
 
 tones.forEach(t=>{
   const src = `${AUDIO_BASE}/tone${t.no}.mp3`;
@@ -143,65 +158,48 @@ tones.forEach(t=>{
     <h2 class="toneTitle">№${t.no}. ${t.name} ♬ ${t.meaning}</h2>
     <audio controls preload="none" src="${src}"></audio>
     <div class="actions">
-      <a class="dlBtn" href="${src}" download data-dl="1">📥 ダウンロード</a>
+      <a class="dlBtn" href="${src}" download>📥 ダウンロード</a>
       <span class="fileSize">計測中…</span>
     </div>`;
-  grid.appendChild(card);                 // ← ここで順番に追加
+  grid.appendChild(card);
 
-  // サイズはあとで埋める
+  // ファイルサイズ表示
   getFileSize(src).then(size=>{
     card.querySelector(".fileSize").textContent = size;
-  }).catch(()=>{ card.querySelector(".fileSize").textContent = "サイズ不明"; });
+  }).catch(()=>{
+    card.querySelector(".fileSize").textContent = "サイズ不明";
+  });
+
+  // ローカル環境だけ：DLリンクの遷移を止めてBlob保存を試行
+  if (!isProd && isLocalLike) {
+    const a = card.querySelector(".dlBtn");
+    a.addEventListener("click", async (e)=>{
+      e.preventDefault();
+      const url = a.href;
+      const name = fileNameFrom(url);
+
+      // 保存を試す → 失敗なら新規タブで表示
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const tmp = document.createElement("a");
+        tmp.href = blobUrl;
+        tmp.download = name;
+        document.body.appendChild(tmp);
+        tmp.click();
+        tmp.remove();
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        // CORS等で保存できない場合は閲覧用に開く
+        window.open(url, "_blank");
+      }
+    }, { passive:false });
+  }
 });
-
-
-
-// 追加 or 置き換え（ページ末尾に）
-  (function(){
-    function fileNameFrom(path, fallback="download.bin"){
-      try { return decodeURIComponent((path.split("/").pop()||"").split("?")[0]) || fallback; }
-      catch { return fallback; }
-    }
-    async function forceDownload(url, filename){
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(blobUrl);
-    }
-
-    // すべての曲DLボタン（data-dl="1"）を“強制DL”に統一
-    document.querySelectorAll('a.dlBtn[data-dl="1"][href]').forEach(a => {
-      if (a.dataset.bound === "1") return;
-      a.dataset.bound = "1";
-      a.addEventListener("click", async (e) => {
-        e.preventDefault(); // 既定の遷移/再生を止める（Chrome/LINE問わず）
-        const url = a.href;
-        const label = a.textContent;
-        a.textContent = "⏳ 準備中…";
-        a.style.pointerEvents = "none";
-        try {
-          await forceDownload(url, fileNameFrom(url));
-          a.textContent = "✅ ダウンロード開始";
-        } catch (err) {
-          console.error(err);
-          a.textContent = "⚠️ ダウンロードできません";
-        } finally {
-          setTimeout(() => {
-            a.textContent = label;
-            a.style.pointerEvents = "";
-          }, 1500);
-        }
-      }, { passive:false });
-    });
-  })();
 </script>
+
 <p>
   <a class="dlBtn" a href="dl_wallpaper.html">待ち受け画像のDLページへ行く</a>
 </p>
