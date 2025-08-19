@@ -233,7 +233,67 @@
 
   closeBtn.addEventListener("click", closeModal);
   modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+  // --- 環境検出 ---
+  const UA = navigator.userAgent || "";
+  const isLINE = /Line\//i.test(UA);                 // LINEアプリ内
+  const isAndroid = /Android/i.test(UA);
+  const isIOS = /iPhone|iPad|iPod/i.test(UA);
+
+  // --- バナー表示（任意） ---
+  if (isLINE) {
+    const note = document.createElement("div");
+    note.style.cssText = "background:#fff3cd;color:#664d03;border:1px solid #ffecb5;border-radius:8px;padding:10px 12px;margin:10px auto;max-width:960px;font-size:14px;";
+    note.innerHTML = "LINEアプリ内では保存できない場合があります。右上のメニューから<strong>外部ブラウザで開く</strong>を選ぶか、下のボタンで<strong>ダウンロード</strong>をお試しください。";
+    document.querySelector("main")?.prepend(note);
+  }
+
+  // --- 強制ダウンロード（Blob経由） ---
+  function fileNameFrom(path, fallback="file.bin"){
+    try { return decodeURIComponent((path.split("/").pop()||"").split("?")[0]) || fallback; }
+    catch { return fallback; }
+  }
+  async function forceDownload(url, filename){
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(blobUrl);
+  }
+
+  // すべての「.dlBtn」を強制DLに差し替え（LINE内のみ）
+  if (isLINE) {
+    document.querySelectorAll('a.dlBtn[href]').forEach(a => {
+      a.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const url = a.href;
+        const name = fileNameFrom(url, "download");
+        const origText = a.textContent;
+        a.textContent = "⏳ 準備中…";
+        a.style.pointerEvents = "none";
+        try {
+          await forceDownload(url, name);
+          a.textContent = "✅ ダウンロード開始";
+        } catch (err) {
+          a.textContent = "⚠️ 保存できません（外部ブラウザ推奨）";
+          console.error(err);
+        } finally {
+          setTimeout(() => {
+            a.textContent = origText;
+            a.style.pointerEvents = "";
+          }, 1500);
+        }
+      }, { passive:false });
+    });
+  }
 </script>
+<p>※LINEアプリ内では保存できないことがあります。三点メニュー→外部、またはデフォルトブラウザで開くをお試しください。</p>
 
 <p>
   <a class="dlBtn" href="dl_music.html">ToneのDLページへ行く</a>
