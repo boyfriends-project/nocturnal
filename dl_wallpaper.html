@@ -75,18 +75,16 @@
       color: #fff;
       cursor: pointer;
     }
-#download,
+/* 既存の #download, .dlBtn へのスタイルは .dlBtn に統一推奨 */
 .dlBtn{
-      appearance:none;border:0;border-radius:8px;padding:10px 14px;
-      background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
-      display:inline-flex;gap:5px;align-items:center;box-shadow:0 4px 14px rgba(255,77,141,.35)
-    }
-#download:hover,
-.dlBtn:hover {
-  background: #e73370;
+  appearance:none;border:0;border-radius:8px;padding:10px 14px;
+  background:#c4a3ff;color:#fff;font-weight:700;text-decoration:none;
+  display:inline-flex;gap:5px;align-items:center;box-shadow:0 4px 14px rgba(255,77,141,.35)
 }
-.bulk-download{margin:14px 0 22px}
+.dlBtn:hover{ background:#e73370; }.bulk-download{margin:14px 0 22px}
 .bulk-download .dlBtn{display:inline-flex;align-items:center;gap:.5rem}
+
+.dlBtn.disabled { pointer-events: none; opacity: .6; }
 
   </style>
 
@@ -97,18 +95,19 @@
   <h1>スマホ用壁紙DLページ</h1>
 
 <div class="bulk-download">
-  <a id="download" href="./images/dl/wallpapers.zip" download>
+  <a id="bulk-download" class="dlBtn"
+     href="images/dl/wallpapers.zip" download>
     📦 壁紙20枚をまとめてダウンロード
   </a>
 </div>
 
   <!-- サムネ一覧 -->
   <div class="gallery">
-    <img src="./images/god/ルビー神.webp" data-full="./images/dl/紅焔の戦神アグニオス.webp" alt="神さま01" loading="lazy">
-    <img src="./images/god/セレナイト神.webp" data-full="./images/dl/月光の導神セレヴィス.webp" alt="神さま02" loading="lazy">
-<img src="./images/god/サファイア神.webp" data-full="./images/dl/夢紡ぎの幻神ノクティス.webp" alt="神さま03" loading="lazy">
-    <img src="./images/god/アンバー神.webp" data-full="./images/dl/海皇神ナギノミコト.webp" alt="神さま04" loading="lazy">
-    <img src="./images/god/ガーネット神.webp" data-full="./images/dl/契約の冥王タナクリス.webp" alt="神さま05" loading="lazy">
+    <img src="images/god/ルビー神.webp" data-full="images/dl/紅焔の戦神アグニオス.webp" alt="神さま01" loading="lazy">
+    <img src="images/god/セレナイト神.webp" data-full="images/dl/月光の導神セレヴィス.webp" alt="神さま02" loading="lazy">
+<img src="images/god/サファイア神.webp" data-full="images/dl/夢紡ぎの幻神ノクティス.webp" alt="神さま03" loading="lazy">
+    <img src="images/god/アンバー神.webp" data-full="images/dl/海皇神ナギノミコト.webp" alt="神さま04" loading="lazy">
+    <img src="images/god/ガーネット神.webp" data-full="./images/dl/契約の冥王タナクリス.webp" alt="神さま05" loading="lazy">
 
     <img src="./images/god/ホワイトラブラドライト神.webp" data-full="./images/dl/光虹の橋神グリムルスト.webp" alt="神さま06" loading="lazy">
     <img src="./images/god/ラリマー神.webp" data-full="./images/dl/蒼環の守帝エリュシオン.webp" alt="神さま07" loading="lazy">
@@ -139,42 +138,103 @@
   <div id="modal" class="modal">
     <span id="close">&times;</span>
     <img id="modal-img" src="" alt="">
-    <a id="download" href="" download>📥 ダウンロード</a>
-  </div>
+    <a id="modal-download" class="dlBtn" href="" download>📥 ダウンロード</a>
+</div>
 
   <script>
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modal-img");
-const downloadLink = document.getElementById("download");
+  const modal = document.getElementById("modal");
+  const modalImg = document.getElementById("modal-img");
+  const modalDownload = document.getElementById("modal-download"); // モーダル内のDLボタン
+  const closeBtn = document.getElementById("close");
 
-function openModal(previewSrc, fullSrc){
-  modal.classList.add("open");
-  modalImg.src = previewSrc || fullSrc;
-  downloadLink.href = fullSrc;
-  document.body.style.overflow = "hidden"; // 背景スクロール止める（任意）
-}
-function closeModal(){
-  modal.classList.remove("open");
-  modalImg.src = "";                          // メモリ解放
-  document.body.style.overflow = "";          // スクロール復帰
-}
+  // 文字化けを避けてファイル名を作る
+  function fileNameFrom(path, fallback="wallpaper.webp"){
+    try {
+      const name = decodeURIComponent(path.split('/').pop() || "");
+      return name || fallback;
+    } catch {
+      return fallback;
+    }
+  }
 
-document.querySelectorAll(".gallery img").forEach(img => {
-  img.addEventListener("click", () => {
-    openModal(img.dataset.preview, img.dataset.full);
+  // 404簡易チェック（任意）
+  async function exists(url){
+    try {
+      const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+      return res.ok;
+    } catch { return false; }
+  }
+
+  // ★どのブラウザでもダウンロードさせる関数（Blob経由）
+  async function forceDownload(url, filename){
+    const res = await fetch(url, { cache: "no-store" });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    // iOS対策：同タブでOK。新規タブが必要なら target="_blank" を付ける
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(blobUrl);
+  }
+
+  function openModal(previewSrc, fullSrc){
+    const src = fullSrc || previewSrc;
+    const safe = encodeURI(src);             // 日本語ファイル名を安全に
+    modal.classList.add("open");
+    modalImg.src = safe;
+
+    // ボタンの既定href（フォールバックとして残す）
+    modalDownload.href = safe;
+    modalDownload.setAttribute("download", fileNameFrom(src));
+    modalDownload.textContent = "📥 ダウンロード";
+    modalDownload.classList.remove("disabled");
+
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal(){
+    modal.classList.remove("open");
+    modalImg.src = "";
+    document.body.style.overflow = "";
+  }
+
+  // ギャラリーの画像クリックでモーダルを開く
+  document.querySelectorAll(".gallery img").forEach(img => {
+    img.addEventListener("click", () => openModal(img.dataset.preview, img.dataset.full));
   });
-});
 
-document.getElementById("close").addEventListener("click", closeModal);
-modal.addEventListener("click", (e) => {
-  if (e.target === modal) closeModal();       // 背景タップで閉じる
-});
+  // ✨ ここが重要：DLボタンは強制ダウンロードを実行
+  modalDownload.addEventListener("click", async (e) => {
+    // a[href]の既定遷移を止めて、確実にダウンロードさせる
+    e.preventDefault();
+    const url = modalDownload.href;
+    const name = fileNameFrom(url);
+    modalDownload.textContent = "⏳ 準備中…";
+    modalDownload.classList.add("disabled");
+    try {
+      // 存在チェック（任意）
+      if (!(await exists(url))) throw new Error("not-found");
+      await forceDownload(url, name);
+      modalDownload.textContent = "✅ ダウンロード完了";
+    } catch(err){
+      modalDownload.textContent = "⚠️ ダウンロードできません";
+      console.error(err);
+    } finally {
+      setTimeout(() => {
+        modalDownload.textContent = "📥 ダウンロード";
+        modalDownload.classList.remove("disabled");
+      }, 1500);
+    }
+  });
 
+  closeBtn.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 </script>
 
 <p>
-  <a class="dlBtn" a href="dl_music.html">ToneのDLページへ行く</a>
+  <a class="dlBtn" href="dl_music.html">ToneのDLページへ行く</a>
 </p>
-
-</body>
-</html>
