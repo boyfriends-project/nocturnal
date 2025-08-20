@@ -31,13 +31,26 @@
     margin: 0;
     padding: 20px;
   }
+/* 任意：カードをセル幅いっぱいにしたい時はコメント解除 */
+/* .gallery img{ max-width: none; } */
+
   h1 { margin-bottom: 20px; }
 
+  /* ▼ usage-note と同じ幅に揃える */
+.gallery{
+  width: clamp(280px, 92vw, 900px);
+  margin-inline: auto;
+
+  display: grid;
+  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+/* usage-note のPC幅拡張に合わせる（任意） */
+@media (min-width: 1024px){
   .gallery{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
+    width: min(100%, 960px);
   }
+}
   .gallery img{
     width: 100%;
     max-width: 200px;
@@ -141,6 +154,95 @@
   pointer-events: none;
   opacity: .85;
 }
+/* ページ幅を揃える共通ラッパ（任意だけどおすすめ） */
+.page-wrap{
+  width: clamp(320px, 92vw, 1100px);  /* スマホ〜PCまで綺麗に伸縮 */
+  margin: 0 auto;
+}
+
+/* 注意ボックス */
+/* ▼ usage-note：ベース */
+/* usage-note */
+.usage-note {
+  background:#fff;
+  border:1px solid #e5d9ff;
+  box-shadow: 0 6px 18px rgba(76,29,149,.07);
+  border-radius:12px;
+  padding:1.25rem 1.5rem;
+  margin: 1.5rem auto;
+  width: 100%;              /* 横幅は画面いっぱい */
+  max-width: 900px;         /* PCでは最大900px */
+  box-sizing: border-box;   /* paddingも含めて幅計算 */
+  color:#4c1d95;
+  line-height:1.7;
+  text-align:left;
+  backdrop-filter: blur(2px);
+}
+
+/* 見出し */
+.usage-note h2 {
+  font-size:1.05rem;
+  margin:0 0 .6rem;
+  text-align:center;
+  color:#7c3aed;
+}
+
+/* ---------- スマホ用 ---------- */
+@media (max-width: 480px){
+  .usage-note {
+    padding: 1rem;
+    margin: 1rem auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .usage-note h2 {
+    font-size: 1rem;
+  }
+  .usage-note ul {
+    padding-left: 1rem;
+  }
+}
+
+/* 箇条書きの読みやすさを改善 */
+/* 箇条書き（ベース） */
+/* 箇条書き */
+.usage-note ul {
+  margin:.4rem 0 0;
+  padding-left:1.2rem;
+}
+.usage-note li {
+  margin:.35rem 0;
+}
+
+/* ---------- タブレット〜PC ---------- */
+@media (min-width: 768px){
+  .usage-note {
+    padding: 1.5rem 1.75rem;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+  .usage-note h2 {
+    font-size: 1.15rem;
+  }
+}
+
+/* ▼ スマホ（～480px） */
+@media (max-width: 480px){
+  .usage-note{
+    padding: 1rem;
+    margin: 1.5rem auto;
+    font-size: .95rem;
+    line-height: 1.6;
+  }
+  .usage-note h2{ font-size: 1.05rem; }
+  .usage-note ul{ padding-left: 1rem; }   /* ←ここが上書きされない位置 */
+}
+
+/* 広めの画面では少しだけ大きくして余白を足す */
+@media (min-width: 1024px){
+  .usage-note{ width: min(100%, 960px); padding:1.5rem 1.75rem; }
+  .usage-note h2{ font-size:1.15rem; }
+}
 
 </style>
 
@@ -201,6 +303,22 @@
     <a id="modal-download" class="dlBtn" href="#" download>📥 ダウンロード</a>
   </div>
 </div>
+
+<div class="usage-note">
+  <h2>🔔ご利用について</h2>
+  <p>
+    当サイトおよびBOYFRIENDS公式LINEにて提供される音楽・画像は、著作権法により保護されています。
+  </p>
+  <ul>
+    <li>無断転載・二次配布・商用利用は禁止です。</li>
+    <li>個人利用を目的としたSNSでのシェアは大歓迎です💎</li>
+    <li>詳細な利用をご希望の場合は運営者までご相談ください。</li>
+  </ul>
+</div>
+
+<p>
+  <a class="dlBtn" href="dl_music.html">ToneのDLページへ行く</a>
+</p>
 
 <script>
   const modal = document.getElementById("modal");
@@ -305,10 +423,6 @@ setTimeout(() => {
 attachDLFeedback(document.getElementById("modal-download"));
 document.querySelectorAll(".bulk-download .dlBtn").forEach(attachDLFeedback);
 </script>
-
-<p>
-  <a class="dlBtn" href="dl_music.html">ToneのDLページへ行く</a>
-</p>
 
 </body>
 </html>
